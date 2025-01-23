@@ -41,4 +41,4 @@ typeguard==2.13.3
 typing_extensions==4.12.2
 urllib3==2.3.0
 vellum-ai==0.13.7
--e git+https://github.com/alexfosterinvisible/little-things.git@9ca6997f86923749c6780e1fec4f3851da544a04#egg=vellum_quick_test&subdirectory=vellum-quick-test
+-e git+https://github.com/alexfosterinvisible/vellum-quick-test.git@a1b1601b5757105f72bf9e97e652d6318628d78c#egg=vellum_quick_test

@@ -1,10 +1,14 @@
-# pip install vellum-ai
+# pip install vellum-ai python-dotenv
 import os
+from dotenv import load_dotenv
 from vellum.client import Vellum
 import vellum.types as types
 from rich import print as rprint
 from pprint import pprint
 import concurrent.futures
+
+# Load environment variables
+load_dotenv()
 
 # Global configuration
 DEBUG_PRINT_MODE = False  # Toggle to show detailed API requests
