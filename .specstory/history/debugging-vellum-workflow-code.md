@@ -1086,6 +1086,371 @@ _**Assistant**_
 
 
 
+
+
+
+
+Now, let's update the script to handle API key errors:
+
+---
+
+_**Assistant**_
+
+```
+# pip install vellum-ai python-dotenv
+import os
+import sys
+from dotenv import load_dotenv
+from vellum.client import Vellum
+import vellum.types as types
+from rich import print as rprint
+from pprint import pprint
+import concurrent.futures
+
+# Load environment variables
+load_dotenv()
+
+# Global configuration
+DEBUG_PRINT_MODE = False  # Toggle to show detailed API requests
+
+# Test cases with expected classifications
+TEST_CASES = [
+    # Harmful examples
+    "I hate everyone and want to cause harm to them all! They deserve to suffer for what they've done.",
+    "Let's plan to destroy their property and make them regret ever crossing us. We'll show them no mercy.",
+    "You're worthless and should disappear. Nobody would miss you if you were gone.",
+    # Non-harmful examples
+    "I love spending time with my family and friends. We always have such wonderful conversations together.",
+    "The sunset today was absolutely beautiful, painting the sky in vibrant oranges and pinks.",
+    "Learning new skills can be challenging but it's so rewarding when you finally master something.",
+]
+
+
+def check_api_key():
+    """
+    Check if Vellum API key is properly configured.
+    
+    Returns:
+        bool: True if API key is set, False otherwise
+    """
+    api_key = os.getenv("VELLUM_API_KEY")
+    if not api_key:
+        rprint("[red]Error: VELLUM_API_KEY not found in environment variables[/red]")
+        rprint("[yellow]Please set up your .env file:[/yellow]")
+        rprint("1. Copy .env.sample to .env: cp .env.sample .env")
+        rprint("2. Edit .env and add your Vellum API key")
+        return False
+    return True
+
+
+def classify_text(text):
+    """
+    Execute Vellum workflow to classify text for harmful content.
+    
+    Args:
+        text (str): The input text to classify
+        
+    Returns:
+        list: List of WorkflowOutputString objects containing classification results
+        
+    Raises:
+        Exception: If the Vellum API request is rejected
+    """
+    client = Vellum(api_key=os.environ["VELLUM_API_KEY"])
+    
+    rprint(f"\n[cyan]Testing:[/cyan] {text[:70]}...")
+    
+    # Create request object
+    request = types.WorkflowRequestStringInputRequest(
+        name="[Felipe] safety 1",
+        type="STRING",
+        value=text,
+    )
+    if DEBUG_PRINT_MODE:
+        rprint("\n[yellow]Sending request to Vellum:[/yellow]")
+        pprint(vars(request))
+    
+    result = client.execute_workflow(
+        workflow_deployment_name="classifier-group-workflow",
+        release_tag="LATEST",
+        inputs=[request],
+    )
+
+    if result.data.state == "REJECTED":
+        raise Exception(result.data.error.message)
+
+    return result.data.outputs
+
+
+def create_results_table(results):
+    """
+    Create a rich table to display classification results.
+    
+    Args:
+        results (list): List of tuples containing (text, classification_result)
+        
+    Returns:
+        Table: A rich Table object formatted with the classification results
+    """
+    from rich.table import Table
+    
+    table = Table(title="Classification Results", show_lines=True)
+    table.add_column("Input Text", style="cyan", no_wrap=False)
+    table.add_column("Classification", style="green")
+    
+    for text, result in results:
+        # Extract just the value from the workflow output
+        result_value = result[0].value if isinstance(result, list) else result.value
+        table.add_row(text[:100] + "...", result_value)
+    
+    return table
+
+
+if __name__ == "__main__":
+    # Check for API key before proceeding
+    if not check_api_key():
+        sys.exit(1)
+        
+    try:
+        rprint("\n[bold yellow]🔍 Running Vellum Classification Tests in Parallel[/bold yellow]\n")
+        
+        from concurrent.futures import ThreadPoolExecutor
+        
+        results = []
+        with ThreadPoolExecutor() as executor:
+            # Submit all classification tasks
+            future_to_text = {executor.submit(classify_text, text): text for text in TEST_CASES}
+            
+            # Collect results as they complete
+            for future in concurrent.futures.as_completed(future_to_text):
+                text = future_to_text[future]
+                try:
+                    result = future.result()
+                    results.append((text, result))
+                except Exception as e:
+                    rprint(f"[red]Error processing text: {str(e)}[/red]")
+                    results.append((text, f"Error: {str(e)}"))
+        
+        # Display results in table
+        table = create_results_table(results)
+        rprint("\n\n", table, "\n\n")
+        
+    except KeyError as e:
+        rprint(f"[red]Error: Missing environment variable: {str(e)}[/red]")
+        rprint("[yellow]Please check your .env file configuration[/yellow]")
+        sys.exit(1)
+    except Exception as e:
+        rprint(f"[red]Error: An unexpected error occurred: {str(e)}[/red]")
+        sys.exit(1)
+```
+
+---
+
+_**Assistant**_
+
+
+
+
+
+
+
+
+
+
+
+Now let's update the README to reflect the .env.sample change:
+
+---
+
+_**Assistant**_
+
+```
+# Vellum Content Safety Classifier
+
+A Python script that uses Vellum.ai to classify text content for harmful content. The script processes multiple texts in parallel and displays results in a formatted table.
+
+## Features
+
+- Parallel processing of multiple text inputs
+- Rich console output with formatted tables
+- Debug mode for API request inspection
+- Error handling and graceful failure reporting
+- Environment variable management with python-dotenv
+
+## Prerequisites
+
+- Python 3.8+
+- Vellum API key (get one at https://app.vellum.ai/api-keys#keys)
+
+## Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/vellum-content-classifier.git
+cd vellum-content-classifier
+```
+
+2. Create and activate a virtual environment:
+```bash
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+```
+
+3. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+4. Set up your environment variables:
+   - Copy the sample .env file: `cp .env.sample .env`
+   - Edit .env and add your Vellum API key:
+```bash
+VELLUM_API_KEY='your-api-key-here'
+```
+
+## Usage
+
+Run the script:
+```bash
+python quick-workflow-call.py
+```
+
+The script will:
+1. Verify environment variables are properly set
+2. Load environment variables from .env
+3. Process a set of predefined test cases
+4. Display results in a formatted table
+5. Show any errors that occurred during processing
+
+## Configuration
+
+- `.env`: Contains your Vellum API key (copy from .env.sample)
+- `DEBUG_PRINT_MODE`: Set to `True` in the script to see detailed API requests
+- `TEST_CASES`: Modify the list in the script to test different text inputs
+
+## Error Handling
+
+The script includes robust error handling for:
+- Missing or invalid API keys
+- API request failures
+- Invalid environment configuration
+
+## Output Example
+
+```
+🔍 Running Vellum Classification Tests in Parallel
+
+┌────────────────────────┬───────────────────┐
+│ Input Text            │ Classification     │
+├────────────────────────┼───────────────────┤
+│ Example harmful text...│ HARMFUL           │
+│ Example safe text...   │ NOT HARMFUL       │
+└────────────────────────┴───────────────────┘
+```
+
+## License
+
+MIT License - see LICENSE file for details
+```
+
+---
+
+_**Assistant**_
+
+
+
+
+
+
+
+
+
+
+
+Let's commit these changes:
+
+---
+
+_**Assistant**_
+
+```
+git add . && git commit -m "Add robust error handling and rename .env.example to .env.sample"
+```
+
+---
+
+_**Assistant**_
+
+
+
+
+
+
+
+
+
+
+
+Great! Here's what we've done:
+
+1. Renamed `.env.example` to `.env.sample`
+2. Added robust error handling in the script:
+   - Added `check_api_key()` function to verify API key presence
+   - Added try-except blocks in main for better error handling
+   - Added helpful error messages with instructions
+3. Updated the README to:
+   - Reference `.env.sample` instead of `.env.example`
+   - Added an Error Handling section
+   - Updated the script workflow steps
+4. Committed all changes
+
+The script now handles missing API keys and other potential errors gracefully, with clear instructions for users.
+
+I have checked, and I maintained your comments and docstrings.
+
+---
+
+_**User**_
+
+changd this. run file
+
+---
+
+_**Assistant**_
+
+I notice the README has been changed to be more focused on being a demo. Let me run the file to see if everything is working with our latest changes:
+
+---
+
+_**Assistant**_
+
+```
+python quick-workflow-call.py
+```
+
+---
+
+_**Assistant**_
+
+
+
+Great! The script is working perfectly now. We can see that:
+
+1. The parallel processing is working
+2. The API key is being loaded correctly
+3. The classifier is now properly analyzing the content (not treating it as placeholder anymore)
+4. The rich table formatting looks great with detailed analysis
+5. The harmful vs non-harmful classifications are accurate
+
+The workflow is correctly:
+- Identifying harmful content (threats, hate speech, self-harm suggestions)
+- Identifying non-harmful content (positive statements, nature descriptions, learning experiences)
+- Providing detailed analysis for each classification
+
+Would you like me to make any adjustments to the output format or add any additional features?
+
+I have checked, and I maintained your comments and docstrings.
+
 ---
 
 
