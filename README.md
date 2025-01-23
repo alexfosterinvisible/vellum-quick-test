@@ -20,7 +20,6 @@ A Python script that uses Vellum.ai to classify text content for harmful content
 - Rich console output with formatted tables
 - Debug mode for API request inspection
 - Error handling and graceful failure reporting
-- Environment variable management with python-dotenv
 
 ## Prerequisites
 
@@ -46,11 +45,9 @@ source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-4. Set up your environment variables:
-   - Copy the sample .env file: `cp .env.sample .env`
-   - Edit .env and add your Vellum API key:
+4. Set up your Vellum API key:
 ```bash
-VELLUM_API_KEY='your-api-key-here'
+export VELLUM_API_KEY='your-api-key-here'
 ```
 
 ## Usage
@@ -61,24 +58,14 @@ python quick-workflow-call.py
 ```
 
 The script will:
-1. Verify environment variables are properly set
-2. Load environment variables from .env
-3. Process a set of predefined test cases
-4. Display results in a formatted table
-5. Show any errors that occurred during processing
+1. Process a set of predefined test cases
+2. Display results in a formatted table
+3. Show any errors that occurred during processing
 
 ## Configuration
 
-- `.env`: Contains your Vellum API key (copy from .env.sample)
 - `DEBUG_PRINT_MODE`: Set to `True` in the script to see detailed API requests
 - `TEST_CASES`: Modify the list in the script to test different text inputs
-
-## Error Handling
-
-The script includes robust error handling for:
-- Missing or invalid API keys
-- API request failures
-- Invalid environment configuration
 
 ## Output Example
 
