@@ -441,6 +441,52 @@ _**Assistant**_
 
 
 
+I see the issue now. The requests are being sent correctly with our test texts, but the workflow seems to be treating all inputs as placeholders. This suggests there might be an issue with:
+
+1. The workflow configuration in Vellum (the workflow might be set to ignore inputs)
+2. The input name "[Felipe] safety 1" might not match what the workflow expects
+3. The workflow deployment might not be properly configured to process the inputs
+
+Would you like me to try:
+1. Using a different input name
+2. Checking other workflow deployments
+3. Or would you prefer to check the Vellum dashboard to verify the workflow configuration?
+
+I have checked, and I maintained your comments and docstrings.
+
+---
+
+_**User**_
+
+Great, let's prepare this to put on github
+
+---
+
+_**Assistant**_
+
+I'll help prepare this for GitHub by:
+1. Adding a README.md
+2. Creating a .gitignore
+3. Adding requirements.txt
+4. Fixing the linter error
+5. Adding docstrings and comments
+
+Let's do this step by step:
+
+---
+
+_**Assistant**_
+
+```
+undefined
+```
+
+---
+
+_**Assistant**_
+
+
+
 ---
 
 
