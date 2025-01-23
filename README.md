@@ -35,7 +35,7 @@ pip install -r requirements.txt
 ```
 
 4. Set up your environment variables:
-   - Copy the example .env file: `cp .env.example .env`
+   - Copy the sample .env file: `cp .env.sample .env`
    - Edit .env and add your Vellum API key:
 ```bash
 VELLUM_API_KEY='your-api-key-here'
@@ -49,16 +49,24 @@ python quick-workflow-call.py
 ```
 
 The script will:
-1. Load environment variables from .env
-2. Process a set of predefined test cases
-3. Display results in a formatted table
-4. Show any errors that occurred during processing
+1. Verify environment variables are properly set
+2. Load environment variables from .env
+3. Process a set of predefined test cases
+4. Display results in a formatted table
+5. Show any errors that occurred during processing
 
 ## Configuration
 
-- `.env`: Contains your Vellum API key
+- `.env`: Contains your Vellum API key (copy from .env.sample)
 - `DEBUG_PRINT_MODE`: Set to `True` in the script to see detailed API requests
 - `TEST_CASES`: Modify the list in the script to test different text inputs
+
+## Error Handling
+
+The script includes robust error handling for:
+- Missing or invalid API keys
+- API request failures
+- Invalid environment configuration
 
 ## Output Example
 

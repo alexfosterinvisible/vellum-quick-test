@@ -1,5 +1,6 @@
 # pip install vellum-ai python-dotenv
 import os
+import sys
 from dotenv import load_dotenv
 from vellum.client import Vellum
 import vellum.types as types
@@ -24,6 +25,23 @@ TEST_CASES = [
     "The sunset today was absolutely beautiful, painting the sky in vibrant oranges and pinks.",
     "Learning new skills can be challenging but it's so rewarding when you finally master something.",
 ]
+
+
+def check_api_key():
+    """
+    Check if Vellum API key is properly configured.
+    
+    Returns:
+        bool: True if API key is set, False otherwise
+    """
+    api_key = os.getenv("VELLUM_API_KEY")
+    if not api_key:
+        rprint("[red]Error: VELLUM_API_KEY not found in environment variables[/red]")
+        rprint("[yellow]Please set up your .env file:[/yellow]")
+        rprint("1. Copy .env.sample to .env: cp .env.sample .env")
+        rprint("2. Edit .env and add your Vellum API key")
+        return False
+    return True
 
 
 def classify_text(text):
@@ -90,25 +108,38 @@ def create_results_table(results):
 
 
 if __name__ == "__main__":
-    rprint("\n[bold yellow]🔍 Running Vellum Classification Tests in Parallel[/bold yellow]\n")
-    
-    from concurrent.futures import ThreadPoolExecutor
-    
-    results = []
-    with ThreadPoolExecutor() as executor:
-        # Submit all classification tasks
-        future_to_text = {executor.submit(classify_text, text): text for text in TEST_CASES}
+    # Check for API key before proceeding
+    if not check_api_key():
+        sys.exit(1)
         
-        # Collect results as they complete
-        for future in concurrent.futures.as_completed(future_to_text):
-            text = future_to_text[future]
-            try:
-                result = future.result()
-                results.append((text, result))
-            except Exception as e:
-                rprint(f"[red]Error processing text: {str(e)}[/red]")
-                results.append((text, f"Error: {str(e)}"))
-    
-    # Display results in table
-    table = create_results_table(results)
-    rprint("\n\n", table, "\n\n")
+    try:
+        rprint("\n[bold yellow]🔍 Running Vellum Classification Tests in Parallel[/bold yellow]\n")
+        
+        from concurrent.futures import ThreadPoolExecutor
+        
+        results = []
+        with ThreadPoolExecutor() as executor:
+            # Submit all classification tasks
+            future_to_text = {executor.submit(classify_text, text): text for text in TEST_CASES}
+            
+            # Collect results as they complete
+            for future in concurrent.futures.as_completed(future_to_text):
+                text = future_to_text[future]
+                try:
+                    result = future.result()
+                    results.append((text, result))
+                except Exception as e:
+                    rprint(f"[red]Error processing text: {str(e)}[/red]")
+                    results.append((text, f"Error: {str(e)}"))
+        
+        # Display results in table
+        table = create_results_table(results)
+        rprint("\n\n", table, "\n\n")
+        
+    except KeyError as e:
+        rprint(f"[red]Error: Missing environment variable: {str(e)}[/red]")
+        rprint("[yellow]Please check your .env file configuration[/yellow]")
+        sys.exit(1)
+    except Exception as e:
+        rprint(f"[red]Error: An unexpected error occurred: {str(e)}[/red]")
+        sys.exit(1)

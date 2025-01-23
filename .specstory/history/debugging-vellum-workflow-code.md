@@ -821,6 +821,273 @@ I notice we need to create a .env file to store the Vellum API key. Let's create
 
 ---
 
+_**Assistant**_
+
+```
+VELLUM_API_KEY=VpeHhZt0.vj36sMU2QmnECCRfSwb4Nj9u0IaeFYPN
+```
+
+---
+
+_**Assistant**_
+
+
+
+
+
+
+
+Now let's update the main script to use python-dotenv:
+
+---
+
+_**Assistant**_
+
+```
+# pip install vellum-ai python-dotenv
+import os
+from dotenv import load_dotenv
+from vellum.client import Vellum
+import vellum.types as types
+from rich import print as rprint
+from pprint import pprint
+import concurrent.futures
+
+# Load environment variables
+load_dotenv()
+
+# Global configuration
+DEBUG_PRINT_MODE = False  # Toggle to show detailed API requests
+// ... existing code ...
+```
+
+---
+
+_**Assistant**_
+
+
+
+
+
+
+
+
+
+
+
+Let's update the requirements.txt to include python-dotenv:
+
+---
+
+_**Assistant**_
+
+```
+pip install python-dotenv && pip freeze > requirements.txt
+```
+
+---
+
+_**Assistant**_
+
+
+
+
+
+
+
+
+
+
+
+Finally, let's update the README to mention the .env file:
+
+---
+
+_**Assistant**_
+
+```
+# Vellum Content Safety Classifier
+
+A Python script that uses Vellum.ai to classify text content for harmful content. The script processes multiple texts in parallel and displays results in a formatted table.
+
+## Features
+
+- Parallel processing of multiple text inputs
+- Rich console output with formatted tables
+- Debug mode for API request inspection
+- Error handling and graceful failure reporting
+- Environment variable management with python-dotenv
+
+## Prerequisites
+
+- Python 3.8+
+- Vellum API key (get one at https://app.vellum.ai/api-keys#keys)
+
+## Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/vellum-content-classifier.git
+cd vellum-content-classifier
+```
+
+2. Create and activate a virtual environment:
+```bash
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+```
+
+3. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+4. Set up your environment variables:
+   - Copy the example .env file: `cp .env.example .env`
+   - Edit .env and add your Vellum API key:
+```bash
+VELLUM_API_KEY='your-api-key-here'
+```
+
+## Usage
+
+Run the script:
+```bash
+python quick-workflow-call.py
+```
+
+The script will:
+1. Load environment variables from .env
+2. Process a set of predefined test cases
+3. Display results in a formatted table
+4. Show any errors that occurred during processing
+
+## Configuration
+
+- `.env`: Contains your Vellum API key
+- `DEBUG_PRINT_MODE`: Set to `True` in the script to see detailed API requests
+- `TEST_CASES`: Modify the list in the script to test different text inputs
+
+## Output Example
+
+```
+🔍 Running Vellum Classification Tests in Parallel
+
+┌────────────────────────┬───────────────────┐
+│ Input Text            │ Classification     │
+├────────────────────────┼───────────────────┤
+│ Example harmful text...│ HARMFUL           │
+│ Example safe text...   │ NOT HARMFUL       │
+└────────────────────────┴───────────────────┘
+```
+
+## License
+
+MIT License - see LICENSE file for details
+```
+
+---
+
+_**Assistant**_
+
+
+
+
+
+
+
+
+
+
+
+Let's create the .env.example file:
+
+---
+
+_**Assistant**_
+
+```
+# Get your API key from https://app.vellum.ai/api-keys#keys
+VELLUM_API_KEY=your-api-key-here
+```
+
+---
+
+_**Assistant**_
+
+
+
+
+
+
+
+
+
+
+
+Now let's commit these changes:
+
+---
+
+_**Assistant**_
+
+```
+git add . && git commit -m "Add environment variable support with python-dotenv"
+```
+
+---
+
+_**Assistant**_
+
+
+
+
+
+
+
+Great! Now we have proper environment variable management set up. Here's what we did:
+
+1. Created a `.env` file with the current API key
+2. Created a `.env.example` file as a template
+3. Added python-dotenv to load environment variables
+4. Updated the README with .env setup instructions
+5. Updated requirements.txt to include python-dotenv
+6. Committed all changes
+
+The .env file is properly gitignored (as we can see in .gitignore), so your API key won't be exposed when pushing to GitHub.
+
+I have checked, and I maintained your comments and docstrings.
+
+---
+
+_**User**_
+
+make a .env.sample. catch the API_key error exception in main
+
+---
+
+_**Assistant**_
+
+I'll help make these changes:
+
+1. First, let's rename .env.example to .env.sample:
+
+---
+
+_**Assistant**_
+
+```
+mv .env.example .env.sample
+```
+
+---
+
+_**Assistant**_
+
+
+
+---
+
 
 
 ---
